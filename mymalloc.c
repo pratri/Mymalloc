@@ -6,12 +6,12 @@
 static char memory[mem_size];
 
 //Basic struct can add stuff later
-struct chunk_of_memory{
+struct ListNode{
     int bytes;
     //0 if free 1 if not free
     int free;
     int data;
-    struct chunk_of_memory *next;
+    struct ListNode *next;
 };
 
 //malloc
