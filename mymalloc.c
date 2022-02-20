@@ -14,6 +14,8 @@ struct chunk_of_memory{
 };
 
 //malloc
+//I think for malloc start of with the chunk pointing to the start of the array which is free.
+//Then when you need to malloc, split the chunk according to how many bytes you need and have the next pointer pointing to the other part of the chunk you split
 void *mymalloc(size_t size, char *file, int line){
 
 }
