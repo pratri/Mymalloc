@@ -25,7 +25,7 @@ void *mymalloc(size_t size, char *file, int line){
 
 
 //free
-void free(void *ptr, char *file, int line){
+void myfree(void *ptr, char *file, int line){
     
 }
 //Has to coalesce adjacent byte chunks into one chunk
