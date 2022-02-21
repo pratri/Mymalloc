@@ -15,9 +15,8 @@ struct ListNode{
 };
 
 //malloc
-//I think for malloc start of with a base case for initializing the first struct to be in the memory array with the given number of bytes.
-//Then when you need to malloc use the header to loop through to the end and add the new struct there.
-//Issue I see with that is that there could be empty space in between two structs that will not be used if the one in the middle is freed. 
+//I think for malloc if it is uninitialized start with a struct that occupies the given bytes from memory[0] and return a pointer to that and make a new (next) struct for the rest of the memory and set that to free.
+//Then on subsequent calls you would go through the linked list until you find one that is free and large enough then you would cut that based on how many bytes are needed and create a new linked list with the remaining unused bytes which would still be free.
 void *mymalloc(size_t size, char *file, int line){
 
 }
