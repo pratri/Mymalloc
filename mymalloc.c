@@ -6,15 +6,25 @@
 static char memory[mem_size];
 
 //Basic struct can add stuff later
-struct ListNode{
-    int bytes;
+typedef struct _listnode{
+    // Number of bytes in memory block
+    int size;
     //0 if free 1 if not free
     int free;
-    int data;
+    //Metadata location in memory array
+    int location;
     struct ListNode *next;
-    struct ListNode *previous;
-};
+    struct ListNode *prev;
+} ListNode;
 
+ListNode headNode(){
+    ListNode head;
+    head.size = mem_size-1;
+    head.free = 0;
+    head.location = 0;
+    head.next = NULL;
+    head.prev = NULL;
+}
 //malloc
 //I think for malloc if it is uninitialized start with a struct that occupies the given bytes from memory[0] and return a pointer to that and make a new (next) struct for the rest of the memory and set that to free.
 //Then on subsequent calls you would go through the linked list until you find one that is free and large enough then you would cut that based on how many bytes are needed and create a new linked list with the remaining unused bytes which would still be free.
@@ -39,5 +49,6 @@ void myfree(void *ptr, char *file, int line){
 
 
 int main(int argc, char* argv[]){
-
-}
+//Start of the linked list
+headNode();
+}   
