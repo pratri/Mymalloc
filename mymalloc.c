@@ -9,7 +9,7 @@ static char memory[mem_size];
 typedef struct _listnode{
     // Number of bytes in memory block
     int size;
-    //0 if free 1 if not free
+    //0 if free, 1 if used
     int free;
     //Metadata location in memory array
     int location;
