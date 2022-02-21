@@ -17,6 +17,7 @@ typedef struct _listnode{
     struct ListNode *prev;
 } ListNode;
 
+//Call to create the first node in the linked list
 ListNode headNode(){
     ListNode head;
     head.size = mem_size-1;
