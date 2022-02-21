@@ -24,6 +24,7 @@ ListNode headNode(){
     head.location = 0;
     head.next = NULL;
     head.prev = NULL;
+    return head;
 }
 //malloc
 //I think for malloc if it is uninitialized start with a struct that occupies the given bytes from memory[0] and return a pointer to that and make a new (next) struct for the rest of the memory and set that to free.
@@ -50,5 +51,5 @@ void myfree(void *ptr, char *file, int line){
 
 int main(int argc, char* argv[]){
 //Start of the linked list
-headNode();
+ListNode head = headNode();
 }   
