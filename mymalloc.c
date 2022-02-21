@@ -37,7 +37,7 @@ ListNode newNode(ListNode current, int bytes, int mem){
     new.prev = &current;
     return new;
 }
-//Update the values of the current node
+//Update the values of the current node when memory is allocated
 ListNode updateNode(ListNode current, ListNode new, int bytes){
     current.free = 1;
     current.size = bytes;
@@ -68,6 +68,8 @@ void myfree(void *ptr, char *file, int line){
 
 
 int main(int argc, char* argv[]){
-//Start of the linked list
-ListNode head = headNode();
+    //Start of the linked list
+    ListNode head = headNode();
+    //Remaining memory
+    int mem = head.size;
 }   
