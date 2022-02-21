@@ -26,23 +26,22 @@ ListNode headNode(){
     head.prev = NULL;
     return head;
 }
+
 //Call when a new node is needed
-ListNode newNode(ListNode current, int bytes, int mem){
+ListNode newNode(ListNode *current, int bytes, int mem){
     //Creates new node at the end of the newly allocated block
     ListNode new;
     new.size = mem - bytes - 1;
     new.free = 0;
-    new.location = current.location + bytes;
+    new.location = current->location + bytes;
     new.next = NULL;
-    new.prev = &current;
+    new.prev = current;
+    //Updates current node's parameters
+    current->free = 1;
+    current->size = bytes;
+    current->next = &new;
     return new;
 }
-//Update the values of the current node when memory is allocated
-ListNode updateNode(ListNode current, ListNode new, int bytes){
-    current.free = 1;
-    current.size = bytes;
-    current.next = &new;
-    return current;
 }
 //malloc
 //I think for malloc if it is uninitialized start with a struct that occupies the given bytes from memory[0] and return a pointer to that and make a new (next) struct for the rest of the memory and set that to free.
