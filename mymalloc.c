@@ -12,6 +12,7 @@ struct ListNode{
     int free;
     int data;
     struct ListNode *next;
+    struct ListNode *previous;
 };
 
 //malloc
