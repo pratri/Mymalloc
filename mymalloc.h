@@ -4,6 +4,7 @@
 #define free(p) myfree(p, __FILE__, __LINE__)
 
 #define mem_size 4096
+static char memory[mem_size];
 
 //Basic struct can add stuff later
 typedef struct _listnode{
