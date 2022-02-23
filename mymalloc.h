@@ -61,13 +61,16 @@ void *mymalloc(size_t size, char *file, int line){
     else{
         ptr = *ptr.next;
     }
-    if (ptr.size >= size){
+    //If the current block has more than enough space
+    if (ptr.size > size){
        if (ptr.free == 0){
             ListNode temp = newNode(&ptr, size, mem);
             mem = mem - size;
        }
     }
-    else{
+    //If the current block does not have enough space
+    else if (ptr.size < size){
+        //Iterate through list to find a free block with enough space
         while (ptr.next!=NULL){
             ptr = *ptr.next;
             if (ptr.size >= size && ptr.free == 0){
@@ -75,6 +78,14 @@ void *mymalloc(size_t size, char *file, int line){
                 mem = mem - size;
             }
         }
+        //If there is no such available block
+        if (ptr.next == NULL){
+            //Coalesce two adjacent blocks if their added space is enough
+        }    
+    }
+    //Current block has exact amount needed
+    else{
+        ptr.free = 1;
     }
     return &memory[ptr.location];
 }
