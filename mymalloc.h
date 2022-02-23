@@ -75,7 +75,7 @@ void *mymalloc(size_t size, char *file, int line){
             }
         }
     }
-    return &ptr;
+    return &memory[ptr.location];
 }
 
 
