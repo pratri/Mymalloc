@@ -3,6 +3,8 @@
 #define malloc(s) mymalloc(s, __FILE__, __LINE__)
 #define free(p) myfree(p, __FILE__, __LINE__)
 
+#define mem_size 4096
+
 //Basic struct can add stuff later
 typedef struct _listnode{
     // Number of bytes in memory block
