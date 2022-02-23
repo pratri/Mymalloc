@@ -31,9 +31,9 @@ ListNode headNode(){
 ListNode newNode(ListNode *current, int bytes, int mem){
     //Creates new node at the end of the newly allocated block
     ListNode new;
-    new.size = mem - bytes - 1;
+    new.size = mem - bytes;
     new.free = 0;
-    new.location = current->location + bytes + 1;
+    new.location = current->location + bytes;
     new.next = NULL;
     new.prev = current;
     //Updates current node's parameters
@@ -43,7 +43,6 @@ ListNode newNode(ListNode *current, int bytes, int mem){
     return new;
 }
 
-
 //malloc
 //I think for malloc if it is uninitialized start with a struct that occupies the given bytes from memory[0] and return a pointer to that and make a new (next) struct for the rest of the memory and set that to free.
 //Then on subsequent calls you would go through the linked list until you find one that is free and large enough then you would cut that based on how many bytes are needed and create a new linked list with the remaining unused bytes which would still be free.
@@ -52,7 +51,7 @@ void *mymalloc(size_t size, char *file, int line){
     static int firstRun = 0;
     static ListNode ptr;
     //Remaining memory
-    static int mem = mem_size - 1;
+    static int mem = mem_size;
     //Start linked list if it is the first run
     if (firstRun == 0){
         ptr = headNode();
@@ -61,12 +60,22 @@ void *mymalloc(size_t size, char *file, int line){
     else{
         ptr = *ptr.next;
     }
-   if (ptr.size >= size){
+    if (ptr.size >= size){
        if (ptr.free == 0){
             ListNode temp = newNode(&ptr, size, mem);
-            mem = mem - size - 1;
+            mem = mem - size;
        }
     }
+    else{
+        while (ptr.next!=NULL){
+            ptr = *ptr.next;
+            if (ptr.size >= size && ptr.free == 0){
+                ListNode temp = newNode(&ptr, size, mem);
+                mem = mem - size;
+            }
+        }
+    }
+    return &ptr;
 }
 
 
