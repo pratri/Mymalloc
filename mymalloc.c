@@ -33,7 +33,7 @@ void *mymalloc(size_t size, char *file, int line){
     //Check if there is enough free space in this block
     if (ptr->size > size){
         ListNode *new;
-        new = (ListNode*)(ptr+size);
+        new = (ListNode*)((char*)ptr+size);
         new->size = ptr->size - size - 1;
         new->free = 0;
         new->next = NULL;
@@ -51,7 +51,7 @@ void *mymalloc(size_t size, char *file, int line){
             }
             if(ptr->size > size && ptr->free == 0){
                 ListNode *new;
-                new = (ListNode*)(ptr+size);
+                new = (ListNode*)((char*)ptr+size);
                 new->size = ptr->size - size - 1;
                 new->free = 0;
                 new->next = NULL;
