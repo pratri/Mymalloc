@@ -6,6 +6,14 @@
 
 static char memory[mem_size];
 
+typedef struct _listnode{
+    // Number of bytes in memory block
+    int size;
+    //0 if free, 1 if used
+    int free;
+    struct _listnode *next;
+} ListNode;
+
 void *mymalloc(size_t size, char *file, int line){
     if(size == 0){
         return NULL;
