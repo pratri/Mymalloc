@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "mymalloc.h"
 #define mem_size 4096
+
 static char memory[mem_size];
 
 //Basic struct can add stuff later
@@ -35,23 +37,26 @@ void *mymalloc(size_t size, char *file, int line){
         ptr = ptr->next;
     }
     //Check if there is enough free space in this block
-    if (ptr->size > size){
-        ListNode *new;
-        new = (ListNode*)((char*)ptr+size);
-        new->size = ptr->size - size - 1;
-        new->free = 0;
-        //If ptr is the latest chunk
-        if(ptr->next == NULL){
-            new->next = NULL;
-        }
-        //If this chunk isn't the last
-        else{
-            new->next = ptr->next;
+    if (ptr->size >= size){
+        //Only make a new node if the chunk can be fragmented
+        if(ptr->size > size){
+            ListNode *new;
+            new = (ListNode*)((char*)ptr+size);
+            new->size = ptr->size - size - 1;
+            new->free = 0;
+            //If ptr is the latest chunk
+            if(ptr->next == NULL){
+                new->next = NULL;
+            }
+            //If this chunk isn't the last
+            else{
+                new->next = ptr->next;
+            }
+            ptr->next = new;        
+            ptr->size = size;
         }
         //Update ptr parameters
-        ptr->size = size;
         ptr->free = 1;
-        ptr->next = new;
     }
     //There is not enough space in this chunk
     else{
@@ -64,21 +69,25 @@ void *mymalloc(size_t size, char *file, int line){
                 return NULL;
             }
             //If a large enough chunk that is free is found, allocate it
-            if(ptr->size > size && ptr->free == 0){
-                ListNode *new;
-                new = (ListNode*)((char*)ptr+size);
-                new->size = ptr->size - size - 1;
-                new->free = 0;
-                if(ptr->next == NULL){
-                    new->next = NULL;
-                }
-                else{
-                    new->next = ptr->next;
+            if(ptr->size >= size && ptr->free == 0){
+                if(ptr->size > size){
+                    ListNode *new;
+                    new = (ListNode*)((char*)ptr+size);
+                    new->size = ptr->size - size - 1;
+                    new->free = 0;
+                    //If ptr is the latest chunk
+                    if(ptr->next == NULL){
+                        new->next = NULL;
+                    }
+                    //If this chunk isn't the last
+                    else{
+                        new->next = ptr->next;
+                    }
+                    ptr->next = new;        
+                    ptr->size = size;
                 }
                 //Update ptr parameters
-                ptr->size = size;
                 ptr->free = 1;
-                ptr->next = new;
                 break;
             }
         }
@@ -101,11 +110,6 @@ void myfree(void *ptr, char *file, int line){
 //Optional: Function that can detect memory leaks
 
 int main(int argc, char* argv[]){
-malloc(4094);
-ListNode *ptr;
-ptr = (ListNode*)(memory);
-while(ptr!=NULL){
-    printf("Size: %d\n Free: %d\n", ptr->size, ptr->free);
-    ptr=ptr->next;
-}
+
+    }
 }
