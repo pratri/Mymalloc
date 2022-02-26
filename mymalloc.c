@@ -63,7 +63,7 @@ void *mymalloc(size_t size, char *file, int line){
             }
         }
     }
-    return ptr+1;
+    return (char*)ptr+1;
 }
 
 void myfree(void *ptr, char *file, int line){
