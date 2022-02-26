@@ -21,7 +21,7 @@ void *mymalloc(size_t size, char *file, int line){
     ListNode *ptr;
     ptr = (ListNode*)memory;
     //Start linked list if this is the first malloc
-    if (ptr->next == NULL){
+    if (ptr->size == 0){
         ptr->size = mem_size - 1;
         ptr->free = 0;
         ptr->next = NULL;
