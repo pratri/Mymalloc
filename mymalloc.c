@@ -79,7 +79,7 @@ void *mymalloc(size_t size, char *file, int line){
                     if(ptr->next == NULL){
                         new->next = NULL;
                     }
-                    //If this chunk isn't the last
+                    //If ptr isn't the latest chunk
                     else{
                         new->next = ptr->next;
                     }
