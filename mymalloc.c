@@ -7,6 +7,9 @@
 static char memory[mem_size];
 
 void *mymalloc(size_t size, char *file, int line){
+    if(size == 0){
+        return NULL;
+    }
     ListNode *ptr;
     ptr = (ListNode*)memory;
     //Start linked list if this is the first malloc
@@ -36,7 +39,7 @@ void *mymalloc(size_t size, char *file, int line){
             ptr = ptr->next;
             if(ptr == NULL){
                 printf("Error: not enough memory\n");
-                break;
+                return NULL;
             }
             if(ptr->size > size && ptr->free == 0){
                 ListNode *new;
