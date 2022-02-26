@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
                 break;
             }
             else{
-                a = a-1;
+                a--;
                 free(ptrArray[a]);
             }
         }
