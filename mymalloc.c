@@ -44,7 +44,7 @@ void *mymalloc(size_t size, char *file, int line){
         if(ptr->next == NULL){
             new->next = NULL;
         }
-        //If this chunk is being further divided
+        //If this chunk isn't the last
         else{
             new->next = ptr->next;
         }
