@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "mymalloc.h"
 
+#define mem_size 4096
+
+static char memory[mem_size];
+
 void *mymalloc(size_t size, char *file, int line){
     ListNode *ptr;
     ptr = (ListNode*)memory;
