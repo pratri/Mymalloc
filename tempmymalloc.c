@@ -94,19 +94,25 @@ void *mymalloc(size_t size, char *file, int line){
 
 //free
 void myfree(void *ptr, char *file, int line){
+    //Checking if the ptr is not in the memory array at all
+
     ListNode* pointer = (ListNode*)memory;
     //Checking if the memory has not been malloced to
     if (pointer->size == 0){
         printf("ERROR, Memory is uninitialized");
         return;
     }
+
     //Callling free with an address not obtained from malloc() or not at the start of a chunk
     int checker = 0;
-    while(pointer!=NULL){
-        if((char*)pointer == (char*)ptr-1){
+    
+    while(pointer!=NULL && pointer->size!=0){
+        //printf("ADD pointer: %p, ptr: %p\n", pointer, (ListNode*)ptr -1);
+        if(pointer == (ListNode*)ptr - 1){
             checker = 1;
             break;
         }
+        pointer = (ListNode*)((char*)pointer + pointer->size);
     }
     if(checker == 0){
         printf("Given pointer input is not valid\n");
@@ -115,6 +121,7 @@ void myfree(void *ptr, char *file, int line){
     else{
         //If the chunk is being used, free it
         if(pointer->free == 1){
+            printf("FREED\n");
             pointer->free = 0;
         }
         //If the chunk is already freed, return error
@@ -122,19 +129,18 @@ void myfree(void *ptr, char *file, int line){
             printf("This chunk has already been freed\n");
             return;
         }
+      
     }
     //Coalesce empty adjacent memory chunks
     pointer = (ListNode*)memory;
-    // while(pointer->next != NULL){ 
-    //     if(pointer->free == 0 && pointer->next->free == 0){
-    //         pointer->size = pointer->size + pointer->next->size + 1;
-    //         pointer->next = pointer->next->next;
-    //         pointer = (ListNode*)memory;
-    //     }
-    //     else{
-    //         pointer = pointer->next;
-    //     }
-    // }
+    ListNode* next = (ListNode*)((char*)pointer + pointer->size);
+    while(next!= NULL && next->size!=0){ 
+        next = (ListNode*)((char*)pointer + pointer->size);
+        if(pointer->free == 0 && next->free == 0){
+            pointer->size = pointer->size + next->size;
+        }
+        pointer = next;
+    }
     return;
 }
 
