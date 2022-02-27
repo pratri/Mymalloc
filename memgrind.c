@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include "mymalloc.h"
 
-int randnum(){
-    int num = (rand() % 10);
-    return num;
-}
 int main(int argc, char* argv[]){
     for (int i=0; i<120; i++){
         char* ptr = malloc(1);
@@ -20,7 +16,7 @@ int main(int argc, char* argv[]){
     }
     int a = 0;
     for(int i=0; i<120; i++){
-        int random = randnum();
+        int random = (rand() % 10);
         if(random < 5){
             ptrArray[a] = malloc(1);
             a++;
