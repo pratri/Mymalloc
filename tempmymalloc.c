@@ -22,6 +22,7 @@ void printnode(){
         printf("Counter: %d\n", counter);
         printf("Free: %d\n", pointer->free);
         printf("Size: %d\n", pointer->size);
+        printf("\n");
         counter += 1;
         pointer = (ListNode*)((char*)pointer + pointer->size);
         
@@ -33,59 +34,32 @@ void printnode(){
 //Then on subsequent calls you would go through the linked list until you find one that is free and large enough then you would cut that based on how many bytes are needed and create a new linked list with the remaining unused bytes which would still be free.
 void *mymalloc(size_t size, char *file, int line){
     
-    //If someone mallocs 0 
+    //If malloc 0, return null
     if(size == 0){
         return NULL;
     }
 
     ListNode *ptr;
     ptr = (ListNode*)memory;
-    //Sets the size to the size of the total chunk not just the data
-    //printf("OLD SIZE: %zu\n", size);
     size += sizeof(ptr);
-    //printf("NEW SIZE: %zu\n", size);
-    //Start linked list if this is the first malloc
     if (ptr->size == 0){
-        printf("Started linked list:\n");
         ptr->size = mem_size;
         ptr->free = 0;
     }
     //Iterate through linked list until a free block has been reached
-    printf("NEW MALLOC\n");
-    printf("SIZE: %zu\n", size);
     while(ptr != NULL && ptr->size != 0){
-        //printf("Checking for free\n");
-        printf("PTR TESTING SIZE: %zu, PTR size: %d, ptr free: %d, address: %p\n", size, ptr->size, ptr->free, ptr);
-        printnode();
         if(ptr->size >= size && ptr->free == 0){
-            //Creates a new node that splits the chunk
-            //printf("SPLITTING NEW NODE\n");
-            printf("SIZE: %zu\n", size);
             ListNode *new;
 
-            new = (ListNode*)((char*)ptr+size);
-            printf("PTR: size: %d\n", ptr->size);     
+            new = (ListNode*)((char*)ptr+size);    
             new->size = ptr->size - size;
-            
             new->free = 0;
-            
-            printf("New Size: %d ", new->size);
-            printf("New Free: %d\n", new->free);
-            //ptr->next = new;      
+
             ptr->size = size;
-            printf("PTR NEW SIZE: %d, new is: %d", ptr->size, new->size);
             ptr->free = 1;
-            
-            printf(" PTR: free: %d\n", ptr->free);
-            
-            printf("Last: %p ", ptr);
-            printf("NEW: %p ", new);
-            printf("New Size: %d ", new->size);
-            printf("New Free: %d\n", new->free);
             return ptr+1;
         }
         ptr = (ListNode*)((char*)ptr + ptr->size);
-        printf("PTR SIZE: %d\n", ptr->size);
     }
     printf("Error: not enough memory\n");
     return NULL;
@@ -107,7 +81,6 @@ void myfree(void *ptr, char *file, int line){
     int checker = 0;
     
     while(pointer!=NULL && pointer->size!=0){
-        //printf("ADD pointer: %p, ptr: %p\n", pointer, (ListNode*)ptr -1);
         if(pointer == (ListNode*)ptr - 1){
             checker = 1;
             break;
@@ -121,7 +94,6 @@ void myfree(void *ptr, char *file, int line){
     else{
         //If the chunk is being used, free it
         if(pointer->free == 1){
-            printf("FREED\n");
             pointer->free = 0;
         }
         //If the chunk is already freed, return error
@@ -138,29 +110,16 @@ void myfree(void *ptr, char *file, int line){
         next = (ListNode*)((char*)pointer + pointer->size);
         if(pointer->free == 0 && next->free == 0){
             pointer->size = pointer->size + next->size;
+            pointer = (ListNode*)memory;
         }
-        pointer = next;
+        else{
+            pointer = next;
+        }
     }
     return;
 }
 
 
 int main(int argc, char* argv[]){
-    char* c;
-    
-    mymalloc(128, c, 5);
-    mymalloc(64, c, 5);
-    mymalloc(4, c, 5);
-    mymalloc(256, c, 5);
-    mymalloc(512, c, 5);
-    mymalloc(256, c, 5);
-    mymalloc(512, c, 5);
-    printnode();
-    //int* a = malloc(5*sizeof(int));
-    // for(int i = 0; i<5; i++){
-    //     a[i] = i;
-    //     printf("%d\n", a[i]);
-    // }
 
-    
 }
