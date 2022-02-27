@@ -15,26 +15,31 @@ void *mymalloc(size_t size, char *file, int line){
 
     ListNode *ptr;
     ptr = (ListNode*)memory;
+    //Make size the size of the whole chunk including the pointer
     size += sizeof(ptr);
+    //Case where memory array is unitialized since ptr-> size = 0 then initialize it by setting the size to the whole memory array and set it to free
     if (ptr->size == 0){
         ptr->size = mem_size;
         ptr->free = 0;
     }
     //Iterate through linked list until a free block has been reached
     while(ptr != NULL && ptr->size != 0){
+        //Check if the chunk is large enough and is free
         if(ptr->size >= size && ptr->free == 0){
+            //Split the chunk into two chunks and set the first one to the size requested and set it to not free and the rest would be the othe chunk
             ListNode *new;
-
             new = (ListNode*)((char*)ptr+size);    
             new->size = ptr->size - size;
             new->free = 0;
 
             ptr->size = size;
             ptr->free = 1;
+            //Return the payload
             return (char*)ptr+1;
         }
         ptr = (ListNode*)((char*)ptr + ptr->size);
     }
+    //No available chunk that was large enough and free
     printf("ERROR: not enough memory\n");
     return NULL;
             
@@ -46,6 +51,7 @@ void myfree(void *ptr, char *file, int line){
         return;
     }
     ListNode* pointer = (ListNode*)memory;
+    //Checks if the memory array was never initizlized (malloc was never called)
     if (pointer->size == 0){
         printf("ERROR: memory array is uninitialized\n");
         return;
