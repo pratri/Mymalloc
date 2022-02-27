@@ -28,7 +28,7 @@ The code will also check for an uninitialized memory array by looking at the fir
   If a chunk of memory has been freed, and there is an adjacent block of memory that is also free, then they should coalesce into a single, larger free block of memory. This will be achieved by iterating through the list and checking the current and next node's free variable, if they are both 0 then the current node will have the next node's size added to it.
 
 memgrind.c:
-Custom Stress Test #1: allocate and free the entire memory array 120 times.
+Custom Stress Test #1: allocate and free the size of the entire memory array 120 times.
 Custom Stress Test #2: allocate 100 randomly sized chunks and then free them all.
 
 The average time taken for each of the stress tests were recorded with the clock() function from the time.h library. The average time taken for 50 runs of each stress test are:
