@@ -57,7 +57,7 @@ void *mymalloc(size_t size, char *file, int line){
 
             ptr->size = size;
             ptr->free = 1;
-            return ptr+1;
+            return (char*)ptr+1;
         }
         ptr = (ListNode*)((char*)ptr + ptr->size);
     }
@@ -81,7 +81,7 @@ void myfree(void *ptr, char *file, int line){
     int checker = 0;
     
     while(pointer!=NULL && pointer->size!=0){
-        if(pointer == (ListNode*)ptr - 1){
+        if(pointer == (ListNode*)((char*)ptr - 1)){
             checker = 1;
             break;
         }
