@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "mymalloc.h"
-#define mem_size 4096
 
+#define mem_size 4096
 static char memory[mem_size];
 
 void *mymalloc(size_t size, char *file, int line){
