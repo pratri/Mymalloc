@@ -40,20 +40,20 @@ void *mymalloc(size_t size, char *file, int line){
         ptr = (ListNode*)((char*)ptr + ptr->size);
     }
     //No available chunk that was large enough and free
-    printf("ERROR: not enough memory\n");
+    printf("ERROR: not enough memory available. File: %s, Line: %d\n", file, line);
     return NULL;
             
 }
 void myfree(void *ptr, char *file, int line){
     //Checking if the ptr is not in the memory array at all
     if((char*)ptr < memory || (char*)ptr > memory + mem_size){
-        printf("ERROR: not in memory array\n");
+        printf("ERROR: pointer not in memory array, File: %s, Line: %d\n", file, line);
         return;
     }
     ListNode* pointer = (ListNode*)memory;
     //Checks if the memory array was never initizlized (malloc was never called)
     if (pointer->size == 0){
-        printf("ERROR: memory array is uninitialized\n");
+        printf("ERROR: Memory array is uninitialized, please malloc first. File: %s, Line: %d\n", file, line);
         return;
     }
 
@@ -68,7 +68,7 @@ void myfree(void *ptr, char *file, int line){
         pointer = (ListNode*)((char*)pointer + pointer->size);
     }
     if(checker == 0){
-        printf("ERROR: given pointer is not at the start of a chunk\n");
+        printf("ERROR: given pointer is not at the start of a chunk. File: %s, Line: %d\n", file, line);
         return;
     }
     else{
@@ -78,7 +78,7 @@ void myfree(void *ptr, char *file, int line){
         }
         //If the chunk is already freed, return error
         else{
-            printf("ERROR: this chunk has already been freed\n");
+            printf("ERROR: this chunk has already been freed. File: %s, Line: %d\n", file, line);
             return;
         }
       
