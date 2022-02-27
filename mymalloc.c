@@ -99,13 +99,50 @@ void *mymalloc(size_t size, char *file, int line){
 
 //free
 void myfree(void *ptr, char *file, int line){
-    
+    ListNode* pointer = (ListNode*)memory;
+    //Checking if the memory has not been malloced to
+    if (pointer->next == NULL && pointer->free == 0){
+        printf("ERROR, Memory is uninitialized");
+        return;
+    }
+
+    //Callling free with an address not obtained from malloc() or not at the start of a chunk
+    int checker = 0;
+    while(pointer!=NULL){
+        if(pointer == ptr){
+            checker = 1;
+            break;
+        }
+        pointer = pointer->next;
+    }
+    if(checker == 0){
+        printf("Given pointer input is not valid");
+        return;
+    }
+
+
+    //Calling free a second time on the same pointer
+    ListNode *placeholder;
+    placeholder = (ListNode*)ptr - 1;
+    if(placeholder->free == 0){
+        printf("This chunk was never malloced");
+        return;
+    }
+
+    //Sets the node to free
+    placeholder->free = 0;
+
+    //Memory coallescing
+    pointer = (ListNode*)memory;
+    while(pointer->next != NULL){ 
+        if(pointer->free == 0 && pointer->next->free == 0){
+            pointer->size = pointer->size + pointer->next->size;
+            pointer->next = pointer->next->next;
+        }
+
+        pointer = pointer->next;
+    }
 }
-//Has to coalesce adjacent byte chunks into one chunk
-//Error:
-//Calling free with an address not obtained from malloc
-//Calling free with an address not at the start of a chunk
-//Calling free a second time on the same pointer
 
 //Optional: Function that can detect memory leaks
 
