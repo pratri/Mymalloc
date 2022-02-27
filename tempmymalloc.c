@@ -57,7 +57,7 @@ void *mymalloc(size_t size, char *file, int line){
 
             ptr->size = size;
             ptr->free = 1;
-            return (char*)ptr+1;
+            return ptr+1;
         }
         ptr = (ListNode*)((char*)ptr + ptr->size);
     }
