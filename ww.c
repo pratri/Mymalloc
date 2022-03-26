@@ -1,87 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 
-int main(int argc, char* argv[]){
-    int col;
-    FILE *ptr;
-    //Only scan argv if there are enough inputs
-    if (argc>2){
-        col = atoi(argv[1]);
-        ptr = fopen(argv[2], "r");
-    }
-    else{
-        perror("ERROR");
-        return -1;
-    }
-    //If file name given does not exist
-    if(ptr == NULL)
-    {
-        perror("ERROR");
-        return -1;                
-    }
-    //Read entire text file into char array and close the file
-    fseek(ptr, 0L, SEEK_END);
-    long fileLength = ftell(ptr);
-    rewind(ptr);
-    char* buffer = malloc(fileLength);
-    fread(buffer, fileLength, 1, ptr);
-    fclose(ptr);
+int main(int argc, char* argv[])
+{
+	int col = atoi(argv[1]);
+	int file = open(argv[2], O_RDWR);
+	char* buffer = malloc(500);
+	read(file, buffer, 500);
+	//printf("%s\n", buffer);
 
-    //Clear the file of its contents and reopen in append mode
-    ptr = fopen(argv[2], "w");
-    fclose(ptr);
-    ptr = fopen(argv[2], "a");
-
-    int count = 0;
-    int wordSize = 0;
-    long i = 0;
-    //Iterate through the char array
-    while(i<fileLength){
-        long pos = i;
-
-        if(buffer[i] == '\t'){
-            fprintf(ptr, "%c", buffer[i]);
-            i++;
-            count = 0;
-        }
-        if(buffer[i]!=' '){
-            //Determine the length of a word
-            while(buffer[pos]!=' '){
-                pos++;
-                wordSize++;
-                count++;
-            }
-            //If there is not enough space in the col to hold the word, tab to the next line
-            if(wordSize > (col - count)){
-                fprintf(ptr, "%c", '\t');
-                count = 0;
-            }
-            //Write the word to the text file
-            while(i<pos){
-                fprintf(ptr, "%c", buffer[i]);
-                i++;
-                count++;
-            }
-            //If the word is greater than or equal to the col width, it gets a line to itself
-            if(wordSize >= col){
-                fprintf(ptr, "%c", '\t');
-                wordSize = 0;
-                count = 0;
-            }
-        }
-        //Only keep one white space if there are multiple consecutive white spaces
-        if(buffer[pos]==' '){
-            while(buffer[pos]==' '){
-                pos++;
-                i++;
-            }
-            fprintf(ptr, "%c", ' ');
-            count++;
-        }
-    }
-    
-    fclose(ptr);
-    free(buffer);
-
-    return 0;
+	int pos = 0;
+	int i = 0;
+	int wordLength = 0;
+	
+	while(buffer[i]!='\0'){
+		//If the first character in a line is a white space, skip it until a non white space character is reached
+		if(pos==0 && buffer[i]==' '){
+			i++;
+		}
+		int ptr = i;
+		//Find the length of the word
+		while(buffer[ptr]!=' '&&buffer[ptr]!='\0'){
+			ptr++;
+			wordLength++;
+		}
+		//If the length of the word is longer than the remaining space in the line, start a new line
+		if(wordLength>(col-pos)){
+			dprintf(file, "%c", '\n');
+			pos = 0;
+		}
+		while(i<ptr){
+			dprintf(file, "%c", buffer[i]);
+			pos++;
+			i++;
+		}
+		//When the end of the line has been reached, start a new line
+		if(pos>=col){
+			dprintf(file, "%c", '\n');
+			pos=0;
+		}
+	}
+	free(buffer);
+	close(file);
 }
