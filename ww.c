@@ -5,8 +5,20 @@
 
 int main(int argc, char* argv[])
 {
-	int col = atoi(argv[1]);
-	int file = open(argv[2], O_RDWR);
+    int col;
+    int file;
+    if(argc > 2){
+        col = atoi(argv[1]);
+        file = open(argv[2], O_RDWR);
+    }
+	else{
+        perror("ERROR");
+        exit(EXIT_FAILURE);
+    }
+    if(file == -1){
+        perror("ERROR");
+        exit(EXIT_FAILURE);
+    }
 	char* buffer = malloc(500);
 	read(file, buffer, 500);
 	//printf("%s\n", buffer);
@@ -28,7 +40,7 @@ int main(int argc, char* argv[])
 		}
 		//If the length of the word is longer than the remaining space in the line, start a new line
 		if(wordLength>(col-pos)){
-			dprintf(file, "%c", '\n');
+			dprintf(file, "%c", '\t');
 			pos = 0;
 		}
 		while(i<ptr){
