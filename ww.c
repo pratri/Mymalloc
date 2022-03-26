@@ -19,14 +19,17 @@ int main(int argc, char* argv[])
         perror("ERROR");
         exit(EXIT_FAILURE);
     }
-	char* buffer = malloc(500);
-	read(file, buffer, 500);
-	//printf("%s\n", buffer);
+	char* buffer = malloc(1000);
+	read(file, buffer, 1000);
+    close(file);
+    file = open(argv[2], O_WRONLY);	
+    //printf("%s\n", buffer);
 
 	int pos = 0;
 	int i = 0;
 	int wordLength = 0;
-	
+	int exceedLim = 0;
+
 	while(buffer[i]!='\0'){
 		//If the first character in a line is a white space, skip it until a non white space character is reached
 		if(pos==0 && buffer[i]==' '){
@@ -38,10 +41,11 @@ int main(int argc, char* argv[])
 			ptr++;
 			wordLength++;
 		}
-		//If the length of the word is longer than the remaining space in the line, start a new line
-		if(wordLength>(col-pos)){
-			dprintf(file, "%c", '\t');
+		//If the length of the word is longer than the remaining space in the line it isn't the start of a new line, start a new line
+		if(wordLength>(col-pos)&&pos!=0){
+			dprintf(file, "%c", '\r');
 			pos = 0;
+            exceedLim = 1;
 		}
 		while(i<ptr){
 			dprintf(file, "%c", buffer[i]);
@@ -51,4 +55,7 @@ int main(int argc, char* argv[])
 	}
 	free(buffer);
 	close(file);
+    if(exceedLim!=0){
+        exit(EXIT_FAILURE);
+    }
 }
