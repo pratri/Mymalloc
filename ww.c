@@ -31,9 +31,17 @@ int main(int argc, char* argv[])
 	int exceedLim = 0;
 
 	while(buffer[i]!='\0'){
-		//If the first character in a line is a white space, skip it until a non white space character is reached
-		if(pos==0 && buffer[i]==' '){
-			i++;
+		//If the next character is a white space
+		if(buffer[i]==' '){
+            //If the white space is not going to be the first character in a line, add it
+            if(pos!=0){
+                dprintf(file, "%c", buffer[i]);
+                pos++;
+            }
+            //Iterate through all the remaining white spaces
+            while(buffer[i]==' '){
+                i++;
+            }
 		}
 		int ptr = i;
 		//Find the length of the word
@@ -43,7 +51,7 @@ int main(int argc, char* argv[])
 		}
 		//If the length of the word is longer than the remaining space in the line it isn't the start of a new line, start a new line
 		if(wordLength>(col-pos)&&pos!=0){
-			dprintf(file, "%c", '\r');
+			dprintf(file, "%c", '\n');
 			pos = 0;
             exceedLim = 1;
 		}
@@ -52,6 +60,10 @@ int main(int argc, char* argv[])
 			pos++;
 			i++;
 		}
+        if(pos<col){
+            dprintf(file, "%c", buffer[i]);
+            i++;
+        }
 	}
 	free(buffer);
 	close(file);
