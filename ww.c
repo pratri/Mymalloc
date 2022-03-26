@@ -36,11 +36,6 @@ int main(int argc, char* argv[])
 			pos++;
 			i++;
 		}
-		//When the end of the line has been reached, start a new line
-		if(pos>=col){
-			dprintf(file, "%c", '\n');
-			pos=0;
-		}
 	}
 	free(buffer);
 	close(file);
