@@ -104,7 +104,6 @@ int main(int argc, char* argv[])
             //If the position after printing out the word hasn't reached the col limit, add the white space
             if(pos<=col && buffer[i]!='\n' && buffer[i]!='\t' && buffer[i]!='\0'){
                 dprintf(file, "%c", buffer[i]);
-                printf("%c", buffer[i]);
                 pos++;
                 i++;
             }
