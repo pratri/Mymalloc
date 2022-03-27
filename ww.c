@@ -30,6 +30,10 @@ int main(int argc, char* argv[])
         }
         isDir = 1;
     }
+    //You can't wrap to negative or 0 columns, so make the columns the minimum of 1
+    if(col <= 0){
+        col = 1;
+    }
     //If the input is a file, not a directory
     if(isDir == 0){
         char* buffer = malloc(1000);
