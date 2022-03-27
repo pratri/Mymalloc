@@ -61,45 +61,50 @@ int main(int argc, char* argv[])
 		    }
             //If the next character is a new line
             else if(buffer[i]=='\n'){
-                //If the new line is stand alone, ignore it
-                if(buffer[i+1]!='\n'){
-                    dprintf(file, "%c", ' ');
-                    i++;
-                    pos++;
-                }
                 //If there are multiple consecutive new lines, add them all
-                else{
-                    while(buffer[i]!='\n'){
+                if(buffer[i+1]=='\n'){
+                    while(buffer[i]=='\n'){
                         dprintf(file, "%c", buffer[i]);
                         i++;
                     }
                     pos = 1;
                 }
+                //If the new line is stand alone, ignore it
+                else{
+                    dprintf(file, "%c", ' ');
+                    i++;
+                    pos++;
+                }
             }
 		    int ptr = i;
-		    //Find the length of the word, not counting white spaces or other markers
+		    //Find the length of the word
 		    while(buffer[ptr]!=' ' && buffer[ptr]!='\0' && buffer[ptr]!='\n' && buffer[ptr]!='\t'){
 			    ptr++;
 			    wordLength++;
 		    }
-            //Account for the additional +1 to ptr that moves it past the end of the word 
-            ptr--;
-		    //If the length of the word is longer than the remaining space in the line it isn't the start of a new line, start a new line
-		    if(pos!=1 && wordLength>(col-pos)){
-			    dprintf(file, "%c", '\n');
-			    pos = 1;
+		    //If the length of the word is longer than the remaining space
+		    if(wordLength>(col-pos)){
+                //If it isn't the start of a line or at the end of a line, start a new line
+                if(pos!=1){
+                    pos = 1;
+                    dprintf(file, "%c", '\n');
+                }
                 exceedLim = 1;
 		    }
+            //Account for the additional +1 to ptr that moves it past the end of the word 
+            ptr--;
             //Write the word into the file
 		    while(i<ptr){
 			    dprintf(file, "%c", buffer[i]);
 			    pos++;
 			    i++;
 		    }
+            //Reset word length
             wordLength = 0;
-            //If the position after printing out the word hasn't reached the col limit, add the next character, which should be the white space or other kind of non character character
-            if(pos<=col){
+            //If the position after printing out the word hasn't reached the col limit, add the white space
+            if(pos<=col && buffer[i]!='\n' && buffer[i]!='\t' && buffer[i]!='\0'){
                 dprintf(file, "%c", buffer[i]);
+                printf("%c", buffer[i]);
                 pos++;
                 i++;
             }
