@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <limits.h>
 
 int main(int argc, char* argv[])
 {
@@ -36,10 +37,12 @@ int main(int argc, char* argv[])
     }
     //If the input is a file, not a directory
     if(isDir == 0){
-        char* buffer = malloc(1000);
-	    read(file, buffer, 1000);
+        //Read the file into the buffer
+        char* buffer = malloc(INT_MAX);
+	    read(file, buffer, INT_MAX);
+        //Close and reopen the file in write only mode to clear the file's contents
         close(file);
-        file = open(argv[2], O_WRONLY);	
+        file = open(argv[2], O_WRONLY);
 
 	    int pos = 1;
 	    int i = 0;
