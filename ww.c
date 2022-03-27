@@ -70,9 +70,6 @@ int main(int argc, char* argv[])
             pos++;
             i++;
         }
-        if(wordLength<0){
-            break;
-        }
 	}
 	free(buffer);
 	close(file);
