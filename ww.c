@@ -23,9 +23,8 @@ int main(int argc, char* argv[])
 	read(file, buffer, 1000);
     close(file);
     file = open(argv[2], O_WRONLY);	
-    //printf("%s\n", buffer);
 
-	int pos = 0;
+	int pos = 1;
 	int i = 0;
 	int wordLength = 0;
 	int exceedLim = 0;
@@ -34,7 +33,7 @@ int main(int argc, char* argv[])
 		//If the next character is a white space
 		if(buffer[i]==' '){
             //If the white space is not going to be the first character in a line, add it
-            if(pos!=0){
+            if(pos!=1 && pos<col){
                 dprintf(file, "%c", buffer[i]);
                 pos++;
             }
@@ -45,24 +44,34 @@ int main(int argc, char* argv[])
 		}
 		int ptr = i;
 		//Find the length of the word
-		while(buffer[ptr]!=' '&&buffer[ptr]!='\0'){
+		while(buffer[ptr]!=' '){
+            if(buffer[ptr]=='\0' || buffer[ptr]=='\n' || buffer[ptr]=='\t'){
+                break;
+            }
 			ptr++;
 			wordLength++;
 		}
 		//If the length of the word is longer than the remaining space in the line it isn't the start of a new line, start a new line
-		if(wordLength>(col-pos)&&pos!=0){
+		if(pos!=1 && wordLength>(col-pos)){
 			dprintf(file, "%c", '\n');
-			pos = 0;
+			pos = 1;
             exceedLim = 1;
 		}
+        //Write the word into the file
 		while(i<ptr){
 			dprintf(file, "%c", buffer[i]);
 			pos++;
 			i++;
+            wordLength = 0;
 		}
+        //If the position after printing out the word hasn't reached the col limit, add the next character, which should be the white space or other kind of non character character
         if(pos<col){
             dprintf(file, "%c", buffer[i]);
+            pos++;
             i++;
+        }
+        if(wordLength<0){
+            break;
         }
 	}
 	free(buffer);
