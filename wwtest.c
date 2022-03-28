@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#define BUFFLEN 500
+#define BUFFLEN 12
 
 int main(int argc, char* argv[])
 {
@@ -19,23 +19,29 @@ int main(int argc, char* argv[])
 
     if(argc > 2){
         col = atoi(argv[1]);
-        file = open(argv[2], O_RDONLY);
-    }
-	else{
-        perror("ERROR");
-        exit(EXIT_FAILURE);
+        struct stat is_file;
+        stat(argv[2], &is_file);
+        //printf("IS REGISTER? %s, %d\n", argv[2], S_ISREG(is_file.st_mode));
+        if(!(S_ISREG(is_file.st_mode))){
+            printf("ARGUMENT IS A DIRECTORY\n");
+            dir = opendir(argv[2]);
+            if(dir == NULL){
+                perror("DIRECTORY FAILED");
+                exit(EXIT_FAILURE);
+            }
+            isDir = 1;
+        }else{
+            printf("ARGUMENT IS A FILE\n");
+            file = open(argv[2], O_RDONLY);
+        }
+       
     }
     
-    //If the second input is not a file, check if it is a directory
-    if(file == -1){
-        dir = opendir(argv[2]);
-        //If the second input is not a directory, return error
-        if(dir == NULL){
-            perror("ERROR");
-            exit(EXIT_FAILURE);
-        }
-        isDir = 1;
+	else{
+        perror("NOT ENOUGH ARGUMENTS");
+        exit(EXIT_FAILURE);
     }
+   
     //You can't wrap to negative or 0 columns, so make the columns the minimum of 1
     if(col <= 0){
         col = 1;
@@ -128,57 +134,90 @@ int main(int argc, char* argv[])
     }
     //If the input is a directory
     else{
-        printf("yo this is a directory\n");
+        
         //Assume that the directory only contains text files
-        int files = 0;
         struct dirent *entry;
-        //char add_on[] = "wrap.";
-        
-        
 
         while((entry=readdir(dir)) != NULL){
-            files++;
+            
             //file = open(entry->d_name, O_RDWR);
             struct stat path_stat;
             char str[100];
             strcpy(str, argv[2]);
             strcat(str, "/");
             strcat(str, entry->d_name);
+            int write_file = 0;
 
             stat(str, &path_stat);
-
+            //printf("str: %s, is a %d\n", str, S_ISREG(path_stat.st_mode));
             if(S_ISREG(path_stat.st_mode)){
-                char add_on[] = "wrap.";
-                char filename[100];
-                printf("FILENAME SHOULD BE BLANK: %s\n", filename);
-                strcpy(filename, argv[2]);
-                strcat(filename, "/");
-                strcat(filename, add_on);
-                strcat(filename, entry->d_name);
-                printf("FILENAME: %s\n", filename);
-                file = open(filename, O_WRONLY, 0644);
-                if(file < 0){
+                // char add_on[] = "wrap.";
+                // char filename[100];
+                // strcpy(filename, argv[2]);
+                // strcat(filename, "/");
+                // strcat(filename, add_on);
+                // strcat(filename, entry->d_name);
+                // file = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
+                // if(file < 0){
+                //     perror("Opening");
+                //     exit(EXIT_FAILURE);
+                // }
+                file = open("Test_dir/Text1.txt", O_RDONLY);
+                write_file = open("Test_dir/wrap.Text1.txt", O_WRONLY, 0600);
+                //write(write_file, "HEllo WORLD!\n", 13);
+                if(file < 0){       
                     perror("Opening");
                     exit(EXIT_FAILURE);
                 }
-                char* buffer = '\0';
-                while((read(file, buffer, 1)) > 0){
+                char* buffer = malloc(BUFFLEN);
+                printf("READING\n");
+                int i = 0;
+                //Number of bytes written on line
+                int position = 0;
+                int bytes = 0;
+                while((bytes = read(file, buffer, BUFFLEN)) > 0){
                     //Stuff in file to read;
-                    printf("%s", buffer);
+                    // for(position = 0; position < bytes; position++){
+                    //     if(buf[position] == '\n'){
+
+                    //     }
+                        
+                    // }
+                    //Case where word is cut off in buffer
+                    
+                    //Case where word is too big for line length
+
+                    //Lines do not begin or end in whitespace
+                    
+
+                    while(i < bytes){
+                        //Check if end of line is reached
+                        if(position >= col);
+                        //If whitespace check if next is a word otherwise go until there is a word and only print one space in between
+                        write(write_file, &buffer[i], 1);
+                        i++;
+
+                        //At end check for spaces, should never end in space
+                    }
+                    i = 0;
                 }
                 
                 
-
+                free(buffer);
+                if(close(write_file) < 0){
+                    perror("Clsoing");
+                    exit(EXIT_FAILURE);
+                }
                 if(close(file) < 0){
                     perror("Clsoing");
                     exit(EXIT_FAILURE);
                 }
-                free(buffer);
-                filename = "";
+                //free(buffer);
+                
             }
 
             //close(entry->d_name);
-            printf("File %d: %s, ISFILE: %d\n", files, entry->d_name, S_ISREG(path_stat.st_mode));
+            
         }
 
         //Closes directory
