@@ -96,7 +96,8 @@ int main(int argc, char* argv[])
 			    wordLength++;
                 //If the word is longer than the allocated space, realloc more
                 if(wordLength>sizeof(word)){
-                    word = realloc(word, 2*sizeof(word));
+                    char* temp = realloc(word, 2*sizeof(word));
+                    word = &temp;
                 }
                 //If the end of the buffer has been reached, read more characters from the file
                 if(buffer[i]=='\0' && i==BUFFLEN){
