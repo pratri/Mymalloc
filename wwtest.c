@@ -102,7 +102,6 @@ int main(int argc, char* argv[])
                 if(buffer[i]=='\0' && i==BUFFLEN){
                     memset(buffer, '\0', BUFFLEN);
                     read(file, buffer, BUFFLEN);
-                    word = realloc(word, 2*sizeof(word));
                     i = 0;
                 }
 		    }
