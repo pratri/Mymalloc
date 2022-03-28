@@ -51,10 +51,11 @@ int main(int argc, char* argv[])
         //Read the file into the buffer
         char* buffer = malloc(BUFFLEN);
 	    read(file, buffer, BUFFLEN);
+        char* word = malloc(BUFFLEN);
+        memset(word, '\0', sizeof(word));
 
 	    int pos = 1;
 	    int i = 0;
-        int ptr;
 	    int wordLength = 0;
 	    int exceedLim = 0;
 
@@ -88,11 +89,22 @@ int main(int argc, char* argv[])
                     pos++;
                 }
             }
-		    ptr = i;
-		    //Find the length of the word
-		    while(buffer[ptr]!=' ' && buffer[ptr]!='\0' && buffer[ptr]!='\n' && buffer[ptr]!='\t'){
-			    ptr++;
+		    //Find the length of the word, copy the characters into the word array
+		    while(buffer[i]!=' ' && buffer[i]!='\n' && buffer[i]!='\t'){
+                word[wordLength] = buffer[i];
+			    i++;
 			    wordLength++;
+                //If the word is longer than the allocated space, realloc more
+                if(wordLength>sizeof(word)){
+                    word = realloc(word, 2*sizeof(word));
+                }
+                //If the end of the buffer has been reached, read more characters from the file
+                if(buffer[i]=='\0' && i==BUFFLEN){
+                    memset(buffer, '\0', BUFFLEN);
+                    read(file, buffer, BUFFLEN);
+                    word = realloc(word, 2*sizeof(word));
+                    i = 0;
+                }
 		    }
 		    //If the length of the word is longer than the remaining space
 		    if(wordLength>(col-pos)){
@@ -103,14 +115,16 @@ int main(int argc, char* argv[])
                 }
                 exceedLim = 1;
 		    }
-            //Write the word into the file
-		    while(i<ptr){
-			    printf("%c", buffer[i]);
-			    pos++;
-			    i++;
-		    }
-            //Reset word length
+            //Print out the word
+            int j = 0;
+            while(word[j]!='\0'){
+                printf("%c", word[j]);
+                j++;
+                pos++;
+            }
+            //Reset word length and word array
             wordLength = 0;
+            memset(word, '\0', sizeof(word));
             //If the position after printing out the word hasn't reached the col limit, add the white space
             if(pos<=col && buffer[i]!='\n' && buffer[i]!='\t' && buffer[i]!='\0'){
                 printf("%c", buffer[i]);
@@ -126,6 +140,7 @@ int main(int argc, char* argv[])
 	    }
         printf("\n");
 	    free(buffer);
+        free(word);
 	    close(file);
 
         if(exceedLim!=0){
