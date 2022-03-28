@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#define BUFFLEN 500
+
 int main(int argc, char* argv[])
 {
     int col;
@@ -19,7 +21,7 @@ int main(int argc, char* argv[])
         col = atoi(argv[1]);
         file = fopen(argv[2], "r");
     }
-        else{
+	else{
         perror("ERROR");
         exit(EXIT_FAILURE);
     }
@@ -42,16 +44,17 @@ int main(int argc, char* argv[])
     if(isDir == 0){
         //Read the file into the buffer
         char* buffer = malloc(BUFFLEN);
-            fread(buffer, BUFFLEN, 1, file);
+	    fread(buffer, BUFFLEN, 1, file);
 
-            int pos = 1;
-            int i = 0;
-            int wordLength = 0;
-            int exceedLim = 0;
-	    
+	    int pos = 1;
+	    int i = 0;
+        int ptr;
+	    int wordLength = 0;
+	    int exceedLim = 0;
+
 	    while(i<BUFFLEN && buffer[i]!='\0'){
-                    //If the next character is a white space
-                    if(buffer[i]==' '){
+		    //If the next character is a white space
+		    if(buffer[i]==' '){
                 //If the white space is not going to be the first character in a line, add it
                 if(pos!=1 && pos<col){
                     printf("%c", buffer[i]);
@@ -61,7 +64,7 @@ int main(int argc, char* argv[])
                 while(buffer[i]==' '){
                     i++;
                 }
-                    }
+		    }
             //If the next character is a new line
             if(buffer[i]=='\n'){
                 //If there are multiple consecutive new lines, add them all
@@ -79,29 +82,29 @@ int main(int argc, char* argv[])
                     pos++;
                 }
             }
-                    int ptr = i;
-                    //Find the length of the word
-                    while(buffer[ptr]!=' ' && buffer[ptr]!='\0' && buffer[ptr]!='\n' && buffer[ptr]!='\t'){
-                            ptr++;
-                            wordLength++;
-                    }
-                    //If the length of the word is longer than the remaining space
-                    if(wordLength>(col-pos)){
+		    ptr = i;
+		    //Find the length of the word
+		    while(buffer[ptr]!=' ' && buffer[ptr]!='\0' && buffer[ptr]!='\n' && buffer[ptr]!='\t'){
+			    ptr++;
+			    wordLength++;
+		    }
+		    //If the length of the word is longer than the remaining space
+		    if(wordLength>(col-pos)){
                 //If it isn't the start of a line or at the end of a line, start a new line
                 if(pos!=1){
-			pos = 1;
+                    pos = 1;
                     printf("\n");
                 }
                 exceedLim = 1;
-                    }
+		    }
             //Account for the additional +1 to ptr that moves it past the end of the word 
             ptr--;
             //Write the word into the file
-                    while(i<ptr){
-                            printf("%c", buffer[i]);
-                            pos++;
-                            i++;
-                    }
+		    while(i<ptr){
+			    printf("%c", buffer[i]);
+			    pos++;
+			    i++;
+		    }
             //Reset word length
             wordLength = 0;
             //If the position after printing out the word hasn't reached the col limit, add the white space
@@ -112,13 +115,14 @@ int main(int argc, char* argv[])
             }
             //If the end of the buffer is reached, read more from the file
             if(i==BUFFLEN && buffer[i]=='\0'){
+                memset(buffer, '\0', BUFFLEN);
                 fread(buffer, BUFFLEN, 1, file);
                 i = 0;
             }
-            }
+	    }
         printf("\n");
-            free(buffer);
-            fclose(file);
+	    free(buffer);
+	    fclose(file);
 
         if(exceedLim!=0){
             exit(EXIT_FAILURE);
