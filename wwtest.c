@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {
     int col;
-    FILE *file;
+    int file;
 
     DIR *dir;
     int isDir = 0;
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     }
     
     //If the second input is not a file, check if it is a directory
-    if(file == NULL){
+    if(file == -1){
         dir = opendir(argv[2]);
         //If the second input is not a directory, return error
         if(dir == NULL){
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     if(isDir == 0){
         //Read the file into the buffer
         char* buffer = malloc(BUFFLEN);
-	    fread(buffer, BUFFLEN, 1, file);
+	    read(file, buffer, BUFFLEN);
 
 	    int pos = 1;
 	    int i = 0;
@@ -114,13 +114,13 @@ int main(int argc, char* argv[])
             //If the end of the buffer is reached, read more from the file
             if(i==BUFFLEN && buffer[i]=='\0'){
                 memset(buffer, '\0', BUFFLEN);
-                fread(buffer, BUFFLEN, 1, file);
+                read(file, buffer, BUFFLEN);
                 i = 0;
             }
 	    }
         printf("\n");
 	    free(buffer);
-	    fclose(file);
+	    close(file);
 
         if(exceedLim!=0){
             exit(EXIT_FAILURE);
