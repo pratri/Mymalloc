@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <limits.h>
 
 int main(int argc, char* argv[])
 {
@@ -21,6 +20,7 @@ int main(int argc, char* argv[])
         perror("ERROR");
         exit(EXIT_FAILURE);
     }
+    
     //If the second input is not a file, check if it is a directory
     if(file == -1){
         dir = opendir(argv[2]);
@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
     //If the input is a file, not a directory
     if(isDir == 0){
         //Read the file into the buffer
-        char* buffer = malloc(INT_MAX);
-	    read(file, buffer, INT_MAX);
+        char* buffer = malloc(100000);
+	    read(file, buffer, 100000);
         //Close and reopen the file in write only mode to clear the file's contents
         close(file);
         file = open(argv[2], O_WRONLY);
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 		    //If the next character is a white space
 		    if(buffer[i]==' '){
                 //If the white space is not going to be the first character in a line, add it
-                if(pos!=1 && pos<=col){
+                if(pos!=1 && pos<col){
                     dprintf(file, "%c", buffer[i]);
                     pos++;
                 }
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
                 }
 		    }
             //If the next character is a new line
-            else if(buffer[i]=='\n'){
+            if(buffer[i]=='\n'){
                 //If there are multiple consecutive new lines, add them all
                 if(buffer[i+1]=='\n'){
                     while(buffer[i]=='\n'){
