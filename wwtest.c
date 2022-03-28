@@ -97,8 +97,6 @@ int main(int argc, char* argv[])
                 }
                 exceedLim = 1;
 		    }
-            //Account for the additional +1 to ptr that moves it past the end of the word 
-            ptr--;
             //Write the word into the file
 		    while(i<ptr){
 			    printf("%c", buffer[i]);
