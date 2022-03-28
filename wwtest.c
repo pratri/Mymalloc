@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
     if(argc > 2){
         col = atoi(argv[1]);
-        file = fopen(argv[2], "r");
+        file = open(argv[2], O_RDONLY);
     }
 	else{
         perror("ERROR");
