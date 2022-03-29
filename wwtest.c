@@ -61,11 +61,12 @@ int main(int argc, char* argv[])
         int wordOver = 1;
 
 	    while(i<bytes){
+            //If the end of the file has been reached, break
             if(buffer[i]=='\0'){
                 break;
             }
             //Read the word into the word array
-		    while(buffer[i]!=' ' && buffer[i]!= '\n' && buffer[i]!='\t'){
+		    while(buffer[i]!=' ' && buffer[i]!= '\n' && buffer[i]!='\t' && buffer[i]!='\0'){
                 word[wordLength] = buffer[i];
                 wordLength++;
                 i++;
@@ -115,6 +116,7 @@ int main(int argc, char* argv[])
                 }
                 else{
                     printf(" ");
+                    pos++;
                     i++;
                 }
             }
@@ -123,7 +125,6 @@ int main(int argc, char* argv[])
             wordLength = 0;
             //If the end of the buffer has been reached, read new characters in
             if(i==bytes){
-                memset(buffer, '\0', BUFFLEN);
                 bytes = read(file, buffer, BUFFLEN);
                 i = 0;
             }
