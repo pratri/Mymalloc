@@ -57,11 +57,13 @@ int main(int argc, char* argv[])
 	    int pos = 0;
 	    int i = 0;
 	    int wordLength = 0;
+        int newPar = 0;
+        int wSpace = 0;
 	    int exceedLim = 0;
         int wordOver = 1;
 
 	    while(i<bytes){
-            //If the end of the file has been reached, break
+            //If the end of the file has been reached, end the loop
             if(buffer[i]=='\0'){
                 break;
             }
@@ -97,21 +99,44 @@ int main(int argc, char* argv[])
                 pos = 0;
             }
             else{
-                //If there are two consecutive new lines, new paragraph has begun, print all of them
-                if(buffer[i]=='\n' && buffer[i+1]=='\n'){
+                //If there is a new line, check if there are other consecutive new lines
+                if(buffer[i]=='\n'){
                     while(buffer[i]=='\n'){
-                        printf("%c", buffer[i]);
+                        newPar++;
+                        i++;
+                        //If the end of the buffer has been reached, read more
+                        if(i==bytes){
+                            read(file, buffer, BUFFLEN);
+                            i = 0;
+                        }
+                    }
+                    //If there is more than one new line, print them all
+                    if(newPar>1){
+                        while(newPar>0){
+                            printf("\n");
+                            newPar--;
+                        }
+                        pos = 0;
+                    }
+                    //If there is only one new line, ignore it
+                    else{
+                        printf(" ");
+                        pos++;
                         i++;
                     }
-                    pos = 0;
                 }
-                //If there is a space that is not at the beginning of a line, print it
+                //If there is white space
                 else if(pos!= 0 && buffer[i]==' '){
                     printf("%c", buffer[i]);
                     pos++;
                     //Iterate through any remaining spaces
                     while(buffer[i]==' '){
                         i++;
+                        //If the end of the buffer has been reached, read more
+                        if(i==bytes){
+                            read(file, buffer, BUFFLEN);
+                            i=0;
+                        }
                     }
                 }
                 else{
@@ -137,6 +162,9 @@ int main(int argc, char* argv[])
         if(exceedLim!=0){
             exit(EXIT_FAILURE);
         }
+	else{
+	    return 0;
+	}
     }
     //If the input is a directory
     else{
