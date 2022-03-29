@@ -52,92 +52,69 @@ int main(int argc, char* argv[])
         char* buffer = malloc(BUFFLEN);
 	    read(file, buffer, BUFFLEN);
         char* word = malloc(BUFFLEN);
-        memset(word, '\0', sizeof(word));
+        memset(word, '\0', BUFFLEN);
 
-	    int pos = 1;
+	    int pos = 0;
 	    int i = 0;
 	    int wordLength = 0;
 	    int exceedLim = 0;
+        int wordOver = 1;
 
 	    while(i<BUFFLEN && buffer[i]!='\0'){
-		    //If the next character is a white space
-		    if(buffer[i]==' '){
-                //If the white space is not going to be the first character in a line, add it
-                if(pos!=1 && pos<col){
-                    printf("%c", buffer[i]);
-                    pos++;
+            //Read the word into the word array
+		    while(buffer[i]!=' ' && buffer[i]!= '\n' && buffer[i]!='\t' && buffer[i]!='\0'){
+                word[wordLength] = buffer[i];
+                wordLength++;
+                i++;
+                //If the end of the word array has been reached, realloc it
+                if(wordLength==(wordOver*BUFFLEN)){
+                    wordOver++;
+                    word = realloc(word, wordOver*BUFFLEN);
                 }
-                //Iterate through all the remaining white spaces
-                while(buffer[i]==' '){
+            }
+            //If there is not enough space for the word, create a new line
+            if(wordLength>(col-pos)){
+                printf("\n");
+                pos = 0;
+            }
+            //Print the word
+            printf("%s", word);
+            pos += wordLength;
+            //If the pos is now past the col width, start a new line
+            if(pos>=col){
+                printf("\n");
+                pos = 0;
+                while(buffer[i]==' ' || buffer[i]=='\n'){
                     i++;
                 }
-		    }
-            //If the next character is a new line
-            if(buffer[i]=='\n'){
-                //If there are multiple consecutive new lines, add them all
-                if(buffer[i+1]=='\n'){
+            }
+            else{
+                if(buffer[i]=='\n' && buffer[i+1]=='\n'){
                     while(buffer[i]=='\n'){
                         printf("%c", buffer[i]);
                         i++;
                     }
-                    pos = 1;
                 }
-                //If the new line is stand alone, ignore it
-                else{
-                    printf(" ");
-                    i++;
+                else if(buffer[i]==' '){
+                    printf("%c", buffer[i]);
                     pos++;
+                    while(buffer[i]==' '){
+                        i++;
+                    }
+                }
+                else{
+                    i++;
                 }
             }
-		    //Find the length of the word, copy the characters into the word array
-		    while(buffer[i]!=' ' && buffer[i]!='\n' && buffer[i]!='\t'){
-                word[wordLength] = buffer[i];
-			    i++;
-			    wordLength++;
-                //If the word is longer than the allocated space, realloc more
-                if(wordLength>sizeof(word)){
-                    char* temp = realloc(word, 2*sizeof(word));
-                    word = &temp;
-                }
-                //If the end of the buffer has been reached, read more characters from the file
-                if(buffer[i]=='\0' && i==BUFFLEN){
-                    memset(buffer, '\0', BUFFLEN);
-                    read(file, buffer, BUFFLEN);
-                    i = 0;
-                }
-		    }
-		    //If the length of the word is longer than the remaining space
-		    if(wordLength>(col-pos)){
-                //If it isn't the start of a line or at the end of a line, start a new line
-                if(pos!=1){
-                    pos = 1;
-                    printf("\n");
-                }
-                exceedLim = 1;
-		    }
-            //Print out the word
-            int j = 0;
-            while(word[j]!='\0'){
-                printf("%c", word[j]);
-                j++;
-                pos++;
-            }
-            //Reset word length and word array
+            //Clear the word
+            memset(word, '\0', wordOver*BUFFLEN);
             wordLength = 0;
-            memset(word, '\0', sizeof(word));
-            //If the position after printing out the word hasn't reached the col limit, add the white space
-            if(pos<=col && buffer[i]!='\n' && buffer[i]!='\t' && buffer[i]!='\0'){
-                printf("%c", buffer[i]);
-                pos++;
-                i++;
-            }
-            //If the end of the buffer is reached, read more from the file
+            //If the end of the buffer has been reached, read new characters in
             if(i==BUFFLEN && buffer[i]=='\0'){
                 memset(buffer, '\0', BUFFLEN);
                 read(file, buffer, BUFFLEN);
-                i = 0;
             }
-	    }
+        }
         printf("\n");
 	    free(buffer);
         free(word);
