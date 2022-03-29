@@ -138,8 +138,13 @@ int main(int argc, char* argv[])
             strcpy(str, argv[2]);
             strcat(str, "/");
             strcat(str, entry->d_name);
-            int write_file = 0;
+            int write_file = 0; 
+            /*
+              
+                        Check if file name begins with period or string "wrap" 
 
+
+            */
             stat(str, &path_stat);
             //printf("str: %s, is a %d\n", str, S_ISREG(path_stat.st_mode));
             if(S_ISREG(path_stat.st_mode)){
@@ -163,45 +168,98 @@ int main(int argc, char* argv[])
                 }
                 char* buffer = malloc(BUFFLEN);
                 printf("READING\n");
-                int i = 0;
+                
                 //Number of bytes written on line
-                int position = 0;
+                
                 int bytes = 0;
                 while((bytes = read(file, buffer, BUFFLEN)) > 0){
                     //Stuff in file to read;
-                    // for(position = 0; position < bytes; position++){
-                    //     if(buf[position] == '\n'){
-
-                    //     }
-                        
-                    // }
-                    //Case where word is cut off in buffer
                     
                     //Case where word is too big for line length
 
                     //Lines do not begin or end in whitespace
-                    
-
+                    char* word = malloc(BUFFLEN);
+                    int size_of_word_available = BUFFLEN;
+                    int word_length = 0;
+                    int i = 0;      
+                    int position = 0;
                     while(i < bytes){
-                        //Check if end of line is reached
-                        if(position >= col);
-                        //If whitespace check if next is a word otherwise go until there is a word and only print one space in between
-                        write(write_file, &buffer[i], 1);
-                        i++;
+                        //Case where word is cut off in buffer
+                        char letter = buffer[i];
+                        if(word_length > 0){
+                            if(letter != '\n' && letter != ' '){
+                                //Should mean that it is a letter
+                                strncat(word, &letter, 1);
+                                word_length++;
+                                if((size_of_word_available - 1) == word_length){
+                                    //Keeps the word big enough to fit future ones
+                                    size_of_word_available++;
+                                    word = realloc(word, size_of_word_available);
+                                }
 
-                        //At end check for spaces, should never end in space
+                            }else if(letter == ' ' || letter == '\n'){
+                                
+                                if(position!=0){
+                                    if((position + word_length + 1) <= col){
+                                        //Enough space for the word and its not the first one put a space and then add word
+                                        printf(" ");
+                                        write(write_file, " ", 1);
+                                        printf("%s", word);
+                                        write(write_file, word, word_length);
+                                        position+= word_length + 1;
+                                        word_length = 0;
+                                        memset(word, 0, strlen(word));
+                                        
+                                    }else{
+                                        //Not enough space so make new line and set position to zero
+                                        printf("\n");
+                                        write(write_file, "\n", 1);
+                                        position = 0;
+                                    }
+                                }
+                                if(position == 0){
+                                    //If first thing  then write whole word
+                                    write(write_file, word, word_length);
+                                    position += word_length;
+                                    word_length = 0;
+                                    memset(word, 0, strlen(word));
+                                }
+                                
+                            }else{
+                                printf("UNCERTAIN CHARCTER: %c\n", letter);
+                            }
+                            
+                        }else{
+                            //No current word in word buffer
+                            
+                            if(letter == '\n'){
+                                //Check for new paragraph
+                                printf("\n");
+                                write(write_file, "\n", 1);
+                                position = 0;
+                            }else if(letter == ' '){
+                                continue;
+                            }else{
+                                //Should be a character
+                                strncat(word, &letter, 1);
+                                word_length++;
+                            }
+
+                        }
+        
+                    
+                        i++;
                     }
-                    i = 0;
+                    free(word);
                 }
-                
                 
                 free(buffer);
                 if(close(write_file) < 0){
-                    perror("Clsoing");
+                    perror("Closing");
                     exit(EXIT_FAILURE);
                 }
                 if(close(file) < 0){
-                    perror("Clsoing");
+                    perror("Closing");
                     exit(EXIT_FAILURE);
                 }
                 //free(buffer);
