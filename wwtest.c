@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
         
         //Assume that the directory only contains text files
         struct dirent *entry;
-
+       
         while((entry=readdir(dir)) != NULL){
             
             //file = open(entry->d_name, O_RDWR);
@@ -188,6 +188,7 @@ int main(int argc, char* argv[])
 
             */
             stat(str, &path_stat);
+            
             //printf("str: %s, is a %d\n", str, S_ISREG(path_stat.st_mode));
             if(S_ISREG(path_stat.st_mode)){
                 // char add_on[] = "wrap.";
@@ -201,7 +202,7 @@ int main(int argc, char* argv[])
                 //     perror("Opening");
                 //     exit(EXIT_FAILURE);
                 // }
-                file = open("Test_dir/Text1.txt", O_RDONLY);
+                file = open("Test_dir/Text2.txt", O_RDONLY);
                 write_file = open("Test_dir/wrap.Text1.txt", O_WRONLY, 0600);
                 //write(write_file, "HEllo WORLD!\n", 13);
                 if(file < 0){       
@@ -209,92 +210,197 @@ int main(int argc, char* argv[])
                     exit(EXIT_FAILURE);
                 }
                 char* buffer = malloc(BUFFLEN);
-                printf("READING\n");
+                
                 
                 //Number of bytes written on line
                 
                 int bytes = 0;
+                int position = 0;
+                int word_length = 0;
+                char* word = malloc(BUFFLEN);
+                int size_of_word_available = BUFFLEN;
+                memset(word, '\0', BUFFLEN);
                 while((bytes = read(file, buffer, BUFFLEN)) > 0){
-                    //Stuff in file to read;
-                    
-                    //Case where word is too big for line length
-
-                    //Lines do not begin or end in whitespace
-                    char* word = malloc(BUFFLEN);
-                    int size_of_word_available = BUFFLEN;
-                    int word_length = 0;
-                    int i = 0;      
-                    int position = 0;
+                    //Lines do not begin or end in whitespace              
+                    int i = 0;    
+ 
+                    int next_line_count = 0;
                     while(i < bytes){
-                        //Case where word is cut off in buffer
                         char letter = buffer[i];
+                        
+                        
                         if(word_length > 0){
+                            
                             if(letter != '\n' && letter != ' '){
-                                //Should mean that it is a letter
+                                
+                                
+                                // //Should mean that it is a letter
                                 strncat(word, &letter, 1);
+                                //printf("%c", letter);
                                 word_length++;
+                                
                                 if((size_of_word_available - 1) == word_length){
                                     //Keeps the word big enough to fit future ones
                                     size_of_word_available++;
                                     word = realloc(word, size_of_word_available);
                                 }
 
-                            }else if(letter == ' ' || letter == '\n'){
-                                
+                            }else{
+                                int paragraph_tracker = 0;
+                                if(letter == '\n'){
+                                    
+                                    //When next line shows up check for any following next lines
+                                    
+                                    next_line_count++;
+      
+                                    while(i<bytes-1){
+                                        if(buffer[i+1] == '\n'){
+                                            
+                                            //Then 2 next lines in a row
+                                            next_line_count++;
+                                            
+                                            i++;
+                                        }else{
+                                            // printf(" Checking second n: %d ", next_line_count);
+                                            //Only when it ends does it set paragraph tracker to print new paragraph. Otherwise it oges to the next one
+                                            if(next_line_count >= 2){
+                                                paragraph_tracker = 1;
+                                                
+                                            }else{
+                                                next_line_count = 0;
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                }
                                 if(position!=0){
+                                    
                                     if((position + word_length + 1) <= col){
                                         //Enough space for the word and its not the first one put a space and then add word
                                         printf(" ");
-                                        write(write_file, " ", 1);
+                                        //write(write_file, " ", 1);
                                         printf("%s", word);
-                                        write(write_file, word, word_length);
-                                        position+= word_length + 1;
+                                        //write(write_file, word, word_length);
+                                        position += (word_length + 1);
+                             
                                         word_length = 0;
-                                        memset(word, 0, strlen(word));
+                                        memset(word, '\0', strlen(word));
+
+                                        if(paragraph_tracker == 1){
+                                            //No more next lines so print out a new paragraph after printing out the word
+                                            printf("\n\n");
+                                            paragraph_tracker = 0;
+                                            next_line_count = 0;
+                                            position = 0;
+                                        }
                                         
                                     }else{
                                         //Not enough space so make new line and set position to zero
                                         printf("\n");
-                                        write(write_file, "\n", 1);
+                                        //write(write_file, "\n", 1);
                                         position = 0;
                                     }
                                 }
                                 if(position == 0){
+                                    
                                     //If first thing  then write whole word
-                                    write(write_file, word, word_length);
+                                    // write(write_file, word, word_length);
+                                    printf("%s", word);
                                     position += word_length;
+                                    
                                     word_length = 0;
-                                    memset(word, 0, strlen(word));
+                                    memset(word, '\0', strlen(word));
+
+                                    if(paragraph_tracker == 1){
+                                        //No more next lines so print out a new paragraph after printing out the word
+                                        printf("\n\n");
+                                        paragraph_tracker = 0;
+                                        next_line_count = 0;
+                                        position = 0;
+                                    }
                                 }
                                 
-                            }else{
-                                printf("UNCERTAIN CHARCTER: %c\n", letter);
                             }
                             
-                        }else{
+                        }
+                        if(word_length==0){
                             //No current word in word buffer
-                            
+
                             if(letter == '\n'){
-                                //Check for new paragraph
-                                printf("\n");
-                                write(write_file, "\n", 1);
-                                position = 0;
+                                
+                                int paragraph_tracker1 = 0;
+                                next_line_count++;
+                                while(i<bytes-1){
+                                    //Make sure doesn't go out of buffer range since checking buffer[i+1]
+                                    if(buffer[i+1] == '\n'){
+                                        //Then next multiple lines in a row with a new line
+                                        next_line_count++;
+                                        i++;
+                                    }else{
+                                        //Only when it ends does it set paragraph tracker to print new paragraph. Otherwise it oges to the next one
+                                        if(next_line_count >= 2){
+                                            paragraph_tracker1 = 1;
+                                            
+                                        }else{
+                                            //Only one next line disregard
+                                            next_line_count = 0;
+                                        }
+                                        break;
+                                    }
+                                }
+                                if(paragraph_tracker1 == 1){
+                                    
+                                    if(position == 0){
+                                        //Only print 1 new line
+                                        printf("\n");
+                                    }else{
+                                        printf("\n\n");
+                                    }
+                                    
+                                    paragraph_tracker1 = 0;
+                                    next_line_count = 0;
+                                    position = 0;
+                                }
+
+
                             }else if(letter == ' '){
+                                //Do nothing only print space before a not first word
+                                i++;
                                 continue;
                             }else{
-                                //Should be a character
+                                
+                                //Should be a characters
                                 strncat(word, &letter, 1);
                                 word_length++;
                             }
 
                         }
-        
+                        //TWO PROBLEMS:
+
+                        //1. After the first line the first two words don't have a space in between them
+                            //LINE:            
                     
                         i++;
                     }
-                    free(word);
+
+                    i = 0;
+                    
+                    
                 }
-                
+                //Print out last remaining word in buffer
+                if(strlen(word)){
+            
+                    if((position + word_length + 1) <= col){
+                        
+                        printf(" %s", word);
+                    }else{
+                        printf("\n%s", word);
+                    }
+                    
+                }
+                free(word);
+                printf("\n");
                 free(buffer);
                 if(close(write_file) < 0){
                     perror("Closing");
@@ -307,7 +413,7 @@ int main(int argc, char* argv[])
                 //free(buffer);
                 
             }
-
+            
             //close(entry->d_name);
             
         }
